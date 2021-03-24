@@ -5,6 +5,9 @@ const scoreText = document.getElementById('score');
 const progressBarFull = document.getElementById("progressBarFull")
 const loader = document.getElementById("loader");
 const game = document.getElementById("game");
+let currentChoices;
+let correctAnswer;
+
 
 
 let currentQuestion = {};
@@ -27,7 +30,6 @@ fetch("https://opentdb.com/api.php?amount=10&category=9&difficulty=easy&type=mul
         const answerChoices = [...loadedQuestion.incorrect_answers];
         formattedQuestion.answer = Math.floor(Math.random()*3) +1;
         answerChoices.splice(formattedQuestion.answer -1,0,loadedQuestion.correct_answer);
-        console.log(formattedQuestion)
         answerChoices.forEach((choice, index)=>{
            formattedQuestion["choice" + (index+1)] = choice;
         })
@@ -58,6 +60,7 @@ getNewQuestion = () => {
         //go to the end page
         return window.location.assign('/QuizApp/end.html');
     }
+
     questionCounter++;
     progressText.innerText = `Question ${questionCounter}/${MAX_QUESTIONS}`;
     //Update progress bar
@@ -74,6 +77,7 @@ getNewQuestion = () => {
         choice.innerHTML = currentQuestion['choice' + number];
     });
 
+    currentChoices = document.getElementsByClassName("choice-text");
     availableQuestions.splice(questionIndex,1);
 
     acceptingAnswers = true;
@@ -90,13 +94,36 @@ choices.forEach(choice => {
 
         const classToApply = selectedAnswer == currentQuestion.answer ? 'correct' : 'incorrect';
 
+
+        selectedChoice.parentElement.classList.add(classToApply);
+
         if (classToApply === 'correct'){
             incrementScore(CORRECT_BONUS);
+        } else{
+            for(let i = 0; i<currentChoices.length; i++){
+                if(currentChoices[i].dataset["number"] != currentQuestion.answer) continue;
+
+                currentChoices[i].parentElement.classList.add("correct");
+                currentChoices[i].classList.add("correctAnswer");
+                
+            }
         }
-        selectedChoice.parentElement.classList.add(classToApply);
+        
+        correctAnswer = document.querySelector(".correctAnswer");
+        
+
         setTimeout(() =>{
             selectedChoice.parentElement.classList.remove(classToApply);
+            if(correctAnswer){
+                correctAnswer.parentElement.classList.remove("correct");
+                for (choice of document.querySelectorAll(".choice-text")) {
+                    if (choice.classList.contains("correctAnswer")){
+                        choice.classList.remove("correctAnswer");
+                    }
+                }
+            }
             getNewQuestion();
+            
         }, 1000);
         
     })
