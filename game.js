@@ -62,6 +62,7 @@ fetchQuestions = questionCategory =>{
 
 //Constants
 
+
 const CORRECT_BONUS = 5;
 const MAX_QUESTIONS = 10;
 
