@@ -16,7 +16,7 @@ username.addEventListener('keyup', () =>{
 })
 
 SaveHighScore = (e) => {
-    console.log("Clicked the saved button")
+    username.classList.add("hidden");
     e.preventDefault();
     const score = {
         score: mostRecentScore,
@@ -32,6 +32,6 @@ SaveHighScore = (e) => {
 
     localStorage.setItem('highScores', JSON.stringify(highScores));
 
-    console.log(highScores);
+
 };
 

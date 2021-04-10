@@ -1,5 +1,7 @@
 const question = document.getElementById("question");
 const choices = Array.from(document.getElementsByClassName('choice-text'));
+const categorys = Array.from(document.getElementsByClassName('btn'));
+const category = document.getElementById("category");
 const progressText = document.getElementById('progressText');
 const scoreText = document.getElementById('score');
 const progressBarFull = document.getElementById("progressBarFull")
@@ -7,38 +9,56 @@ const loader = document.getElementById("loader");
 const game = document.getElementById("game");
 let currentChoices;
 let correctAnswer;
+let categorySelection;
 
-
+let category_questions = {
+    Sports : "https://opentdb.com/api.php?amount=10&category=21&difficulty=easy&type=multiple",
+    General_Knowledge : "https://opentdb.com/api.php?amount=10&category=9&difficulty=easy&type=multiple",
+    Science_Nature : "https://opentdb.com/api.php?amount=10&category=17&difficulty=easy&type=multiple",
+    Geography : "https://opentdb.com/api.php?amount=10&category=22&difficulty=easy&type=multiple"
+}
 
 let currentQuestion = {};
 let acceptingAnswers = false;
 let score = 0
 let questionCounter = 0;
 let availableQuestions = [];
-
 let questions = [];
 
-fetch("https://opentdb.com/api.php?amount=10&category=9&difficulty=easy&type=multiple")
-.then( res => {
-    return res.json();
-}).then( loadedQuestions =>{
-    questions = loadedQuestions.results.map(loadedQuestion =>{
-        const formattedQuestion = {
-            question: loadedQuestion.question
-        };
 
-        const answerChoices = [...loadedQuestion.incorrect_answers];
-        formattedQuestion.answer = Math.floor(Math.random()*3) +1;
-        answerChoices.splice(formattedQuestion.answer -1,0,loadedQuestion.correct_answer);
-        answerChoices.forEach((choice, index)=>{
-           formattedQuestion["choice" + (index+1)] = choice;
-        })
-        return formattedQuestion;
+categorys.forEach(btn => {
+    btn.addEventListener("click", e =>{
+        categorySelection = e.target.dataset["text"];
+        category.classList.add("hidden");
+        loader.classList.remove("hidden");
+        fetchQuestions(category_questions[categorySelection]);
     })
-    startGame();
-}).catch(err =>{
-   console.error(err); 
-});
+})
+
+fetchQuestions = questionCategory =>{
+    fetch(questionCategory)
+    .then( res => {
+        return res.json();
+    }).then( loadedQuestions =>{
+        questions = loadedQuestions.results.map(loadedQuestion =>{
+            const formattedQuestion = {
+                question: loadedQuestion.question
+            };
+
+            const answerChoices = [...loadedQuestion.incorrect_answers];
+            formattedQuestion.answer = Math.floor(Math.random()*3) +1;
+            answerChoices.splice(formattedQuestion.answer -1,0,loadedQuestion.correct_answer);
+            answerChoices.forEach((choice, index)=>{
+            formattedQuestion["choice" + (index+1)] = choice;
+            })
+            return formattedQuestion;
+        })
+        startGame();
+    }).catch(err =>{
+    console.error(err); 
+    });
+}
+    
 
 //Constants
 
@@ -58,7 +78,7 @@ getNewQuestion = () => {
     if (availableQuestions.length === 0 || questionCounter >= MAX_QUESTIONS){
         localStorage.setItem("mostRecentScore", score);
         //go to the end page
-        return window.location.assign('/QuizApp/end.html');
+        return window.location.assign('QuizApp/end.html');
     }
 
     questionCounter++;

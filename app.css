@@ -83,6 +83,7 @@ h3 {
   /* BUTTONS */
   .btn {
     font-size: 1.8rem;
+    outline: none;
     padding: 1rem 0;
     width: 20rem;
     text-align: center;
